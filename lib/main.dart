@@ -40,14 +40,24 @@ class _MyHomePageState extends State<MyHomePage> {
     //loop
     List<User> users = [];
     for (var u in jsonData){
-      User user = User(u["id"], u["name"], u["username"], u["email"], /*u["address"],*/ u["phone"], u["website"]);
+      User user = User(
+                   u["id"], 
+                   u["name"], 
+                   u["username"], 
+                   u["email"], 
+                   u["address"], 
+                   u["phone"], 
+                   u["website"], 
+                   u["company"]
+                   );
 
       users.add(user);
     }
     print(users.length);
 
     return users;
-  }
+  } //from Future
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -124,7 +134,7 @@ class DetailPage extends StatelessWidget {
                     boxShadow:[BoxShadow(blurRadius: 7.0, color: Colors.black)]
                   )
                 ),
-                SizedBox(height: 90.0),
+                SizedBox(height: 40.0),
                 Text(
                   user.name,
                   style: TextStyle(
@@ -143,7 +153,7 @@ class DetailPage extends StatelessWidget {
                   ),
                   ),
                 SizedBox(height: 15.0),
-                Text(
+                Text('Phone No.: ' +
                   user.phone,
                   style: TextStyle(
                     fontSize: 17.0,
@@ -151,7 +161,7 @@ class DetailPage extends StatelessWidget {
                   ),
                   ),
                 SizedBox(height: 15.0),
-                Text(
+                Text('Website: '+
                   user.website,
                   style: TextStyle(
                     fontSize: 17.0,
@@ -159,15 +169,14 @@ class DetailPage extends StatelessWidget {
                     fontFamily: 'MonteSerrat'
                   ),
                   ),
-                /*SizedBox(height: 15.0),
-                Text(
-                  user.address.street,
-                  style: TextStyle(
-                    fontSize: 17.0,
-                    fontStyle: FontStyle.italic,
-                    fontFamily: 'MonteSerrat'
-                  ),
-                  )*/
+                SizedBox(height: 20.0),
+                  Text('Address:', style: TextStyle(fontWeight: FontWeight.bold),),
+                  Text(user.address.street +', '+ user.address.suite + ','),
+                  Text(user.address.city +', '+ user.address.zipcode),
+
+                SizedBox(height: 10.0),
+                  Text('Company:', style: TextStyle(fontWeight: FontWeight.bold),),
+                  Text(user.company.name,),
               ],
             ),
           )
@@ -193,15 +202,80 @@ class getClipper extends CustomClipper<Path> {
   }
 }
 
+//Plain Old Dart Object
 class User {
   final int id;
   final String name;
   final String username;
   final String email;
-  //final String address; NESTED
+  Address address; 
   final String phone;
   final String website;
-  //final String company; NESTED
+  Company company;
 
-  User (this.id, this.name, this.username, this.email, /*this.address,*/ this.phone, this.website);
+  var alamat;
+  var syarikat;
+  
+  //Constructor
+  User (
+    this.id,
+    this.name, 
+    this.username, 
+    this.email, 
+    this.alamat, 
+    this.phone, 
+    this.website, 
+    this.syarikat
+    )
+    { //This is for COMPOSITION area, User composed of Address and Company
+      address = new Address();
+      address.street = alamat['street'];
+      address.suite = alamat['suite'];
+      address.city = alamat['city'];
+      address.zipcode = alamat['zipcode'];
+
+      company = new Company();
+      company.name = syarikat['name'];
+    }
+
+    /*factory User.fromJson(Map <String, dynamic>json){
+    return new User(
+        id :json['id'],
+        name : json['name'],
+        username : json['username'],
+        address: Address.fromJson(json['address']),
+        phone : json['phone'],
+        website : json['website'],
+        company : Address.fromJson(json['email'])
+    );
+  }*/
+}
+class Address {
+  String street;
+   String suite;
+   String city;
+   String zipcode;
+
+  //Address (this.street, this.suite, this.city, this.zipcode);
+  Address ();
+  /*use the factory keyword when implementing a constructor 
+  that doesn’t always create a new instance of its class.*/
+  // factory Address.fromJson(Map <String, dynamic>json){
+  //   return new Address(
+  //       street : json['street'],
+  //       //suite : json['suite'],
+  //       //city : json['city'],
+  //       //zipcode : json['zipcode']
+  //   );
+  // }
+}
+class Company {
+  String name;
+
+  Company ();
+  /*factory Company.fromJson(Map <String, dynamic>json){
+    return new Company(
+      name : json['name'],
+    );
+  }*/
 }
